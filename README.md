@@ -49,7 +49,7 @@ aims to:
 - cover **all four common deployment shapes** behind one CRD, with cluster-mode
   as a first-class topology rather than a bolt-on;
 - make **failover and rolling restarts safe by default** — promote a healthy
-  replica *before* taking down a primary, instead of reacting after an outage;
+  replica _before_ taking down a primary, instead of reacting after an outage;
 - keep **data-correctness paths** (bootstrap, scale, reshard, restore) atomic and
   idempotent, including Valkey 9.1+ Atomic Slot Migration;
 - treat **persistence, TLS, ACLs, backups and secret rotation** as declarative
@@ -57,19 +57,19 @@ aims to:
 
 ## Topologies
 
-| Topology    | Status | Failover                                              |
-| ----------- | ------ | ----------------------------------------------------- |
-| Standalone  | ✅     | none                                                  |
-| Replication | ✅     | operator-driven via `REPLICAOF`                       |
-| Sentinel    | ✅     | Sentinel quorum                                       |
-| Cluster     | ✅     | native gossip + operator recovery on majority loss    |
+| Topology    | Status | Failover                                           |
+| ----------- | ------ | -------------------------------------------------- |
+| Standalone  | ✅     | none                                               |
+| Replication | ✅     | operator-driven via `REPLICAOF`                    |
+| Sentinel    | ✅     | Sentinel quorum                                    |
+| Cluster     | ✅     | native gossip + operator recovery on majority loss |
 
 ## CRDs
 
-| Kind            | Purpose                                                   |
-| --------------- | -------------------------------------------------------- |
-| `ValkeyCluster` | Deploy Valkey in one of the four topologies.             |
-| `ValkeyACL`     | Declarative ACL users on a `ValkeyCluster`.              |
+| Kind            | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `ValkeyCluster` | Deploy Valkey in one of the four topologies. |
+| `ValkeyACL`     | Declarative ACL users on a `ValkeyCluster`.  |
 
 ## Features
 
@@ -87,7 +87,7 @@ aims to:
   `valkey.wellcake.io/proactive-rollout: "true"`, default OFF) for Replication /
   Cluster / Sentinel: the StatefulSet switches to `OnDelete`, the operator rolls
   pods one at a time and performs handover (replica promote / `CLUSTER FAILOVER`
-  / `SENTINEL FAILOVER`) *before* restarting the old primary — downtime window
+  / `SENTINEL FAILOVER`) _before_ restarting the old primary — downtime window
   ~0 instead of the reactive ~15–20s
 - **Cluster bootstrap** via a one-shot Job with `valkey-cli --cluster create`
 - **Cluster scale-up / scale-down** via `add-node` / reshard-away + `del-node`;
@@ -132,7 +132,7 @@ aims to:
 - **`maxmemory` auto** = 60% of `resources.limits.memory`
 - **Version-gated 9.x resilience directives** in `renderValkeyConf` (by image
   version): `cluster-allow-replica-migration no` (Cluster), `shutdown-on-sigterm
-  failover` (≥9.0), `tls-auto-reload-interval 3600` (TLS + ≥9.1) — overridable
+failover` (≥9.0), `tls-auto-reload-interval 3600` (TLS + ≥9.1) — overridable
   via `spec.config`
 - **InitContainer** for runtime-config generation (no scripts baked into the CM)
 - **Always PVC, never emptyDir** — ephemeral-storage pressure can trigger
@@ -158,10 +158,21 @@ helm upgrade --install valkey-operator charts/valkey-operator \
   --namespace valkey-system --create-namespace --set image.tag=latest
 ```
 
+The Helm charts (`valkey-operator` and `valkey-cluster`) are also published to
+GitHub Container Registry as OCI artifacts under
+[`ghcr.io/melancholictheory/charts`](https://github.com/users/melancholictheory/packages/container/package/charts%2Fvalkey-operator),
+so you can install without cloning the repo:
+
+```sh
+helm upgrade --install valkey-operator \
+  oci://ghcr.io/melancholictheory/charts/valkey-operator
+```
+
 > Webhooks (validating / mutating / conversion) are opt-in
 > (`--set webhooks.enabled=true`, require cert-manager) and disabled by default.
 
 Operator options:
+
 - `rbac.scope=namespace` or `watchNamespace=<ns>` — single-namespace mode
 - `metrics.serviceMonitor.enabled=true` — for the Prometheus Operator
 - `--skip-crds` — skip CRDs when managing them via GitOps
