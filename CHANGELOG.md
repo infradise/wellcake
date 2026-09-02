@@ -4,18 +4,28 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1]
+
+### Changed
+
+- Dependency bumps: Kubernetes libraries to 0.35.8, ginkgo to 2.32.1, and
+  docker/setup-buildx-action to 4.3.0.
+
 ## [0.8.0]
 
 ### Changed
+
 - Bumped the `github.com/redis/go-redis/v9` client to 9.22.0.
 
 ### Fixed
+
 - The e2e suite retries the cert-manager install, so a transient GitHub download
   error (a 503) no longer fails the whole pipeline in `BeforeSuite`.
 
 ## [0.7.2]
 
 ### Added
+
 - Replication clusters also get a `<cluster>-replicas` Service that load-balances
   across the replica pods only, for spreading reads. It completes the read/write
   split started in 0.7.1: `<cluster>-primary` for writes, `<cluster>-replicas` for
@@ -26,6 +36,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.7.1]
 
 ### Added
+
 - Replication clusters now get a `<cluster>-primary` Service that resolves to the
   current primary only, giving write clients a stable endpoint. The cluster-wide
   client Service (`<cluster>`) load-balances across the primary and its replicas,
@@ -37,6 +48,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.7.0]
 
 ### Added
+
 - Cluster topology now recovers automatically from the loss of a **majority of
   primaries**. Gossip cannot fix this on its own: voting a replica in needs a
   master quorum that no longer exists, so the cluster would otherwise sit in
@@ -54,6 +66,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   data loss and the fenced primaries rejoining as replicas.
 
 ### Changed
+
 - Replicas now authenticate to their primary as a dedicated, least-privilege ACL
   user (`replicator`, granting only `+psync +replconf +ping` and no key access)
   via `masteruser`, instead of the full-access default user, so a leaked
@@ -65,6 +78,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.6.0]
 
 ### Changed
+
 - The operator chart now ships its CRDs as **templates** instead of a top-level
   `crds/` directory, so `helm upgrade` applies schema changes. Helm installs
   `crds/` exactly once and silently ignores it afterwards, which left every
@@ -92,6 +106,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.5.1]
 
 ### Added
+
 - The published Helm charts are now signed with cosign, keyless, using the
   release workflow's own GitHub OIDC identity, so there is no private key to
   store or rotate. Charts are signed **by digest**, so a signature binds to that
@@ -109,6 +124,7 @@ Data-plane telemetry and resilience work built on Valkey 9.1+. Every directive i
 version-gated, so older servers are unaffected.
 
 ### Added
+
 - `valkey_operator_tls_cert_expiry_seconds`: seconds until the earliest-expiring
   served certificate across a cluster's pods (Valkey 9.1+). Valkey does not
   refuse to start on an expired certificate, so this is what catches a stalled
@@ -126,6 +142,7 @@ version-gated, so older servers are unaffected.
   replacements the operator drives.
 
 ### Changed
+
 - Durable Cluster primaries on Valkey 9.0+ now also carry the `safe` shutdown
   token, so descheduling that cannot fail over becomes visible instead of
   silently dropping a slot owner. Cache keeps `failover` alone, since `safe`
@@ -137,6 +154,7 @@ Exploits Valkey 9.1+ features surfaced by a feature-gap review. Every directive
 is version-gated, so older servers are unaffected.
 
 ### Added
+
 - `spec.logging.format` (`json` | `logfmt` | `legacy`) renders `log-format` for
   structured server logs, gated on Valkey 9.1+ (opt-in; unset keeps the default).
 - `cluster-config-save-behavior best-effort` on memory-backed (Cache) Cluster
@@ -144,6 +162,7 @@ is version-gated, so older servers are unaffected.
   availability-first pod. Durable/PVC clusters keep the safe `sync` default.
 
 ### Changed
+
 - Cluster pods running Valkey 9.0+ now set an explicit
   `terminationGracePeriodSeconds` (30s), giving the graceful SIGTERM manual
   failover a guaranteed time budget instead of relying on the Kubernetes default.
@@ -151,11 +170,13 @@ is version-gated, so older servers are unaffected.
 ## [0.3.0]
 
 ### Added
+
 - The `valkey-cluster` chart can create the release Namespace and label it with
   the Pod Security Standards (`namespace.create`, `namespace.podSecurityStandard`),
   so the restricted-PSA-compatible Valkey pods are actually enforced (S2).
 
 ### Changed
+
 - The validating webhook now rejects `profile: Durable` on a `Replication`
   topology at create time. That combination relies on operator-arbitrated
   failover, which has a split-brain window on a network partition (AR1/EC1).
@@ -173,6 +194,7 @@ Hardens auth handling and makes every operator-managed pod compatible with the
 restricted Pod Security Standard.
 
 ### Added
+
 - Pod- and container-level security contexts via new `spec.podSecurityContext`
   and `spec.containerSecurityContext` fields. When unset, the operator applies
   restricted-PSA-compatible defaults to every pod it creates — the StatefulSets,
@@ -182,6 +204,7 @@ restricted Pod Security Standard.
   cluster when it changes, so an external password rotation is picked up.
 
 ### Changed
+
 - Auth passwords are escaped when rendered into `valkey.conf`, fixing startup
   failures for passwords containing characters meaningful to the config/ACL
   parser (quotes, spaces, `#`, and similar).
@@ -192,6 +215,7 @@ restricted Pod Security Standard.
 ## [0.1.1]
 
 ### Added
+
 - Artifact Hub annotations on the operator and cluster Helm charts.
 
 ## [0.1.0]
@@ -199,6 +223,7 @@ restricted Pod Security Standard.
 First public release of the operator. Highlights of the initial feature set:
 
 ### Added
+
 - `ValkeyCluster` CRD covering four topologies: Standalone, Replication,
   Sentinel, and Cluster.
 - `ValkeyACL` CRD for declarative ACL users (applied to all nodes of a shard in
@@ -230,6 +255,7 @@ First public release of the operator. Highlights of the initial feature set:
 - CEL XValidation for immutable and conditional fields; config-hash-driven
   rolling restarts; version-gated Valkey 9.x resilience directives.
 
+[0.8.1]: https://github.com/melancholictheory/wellcake/releases/tag/v0.8.1
 [0.8.0]: https://github.com/melancholictheory/wellcake/releases/tag/v0.8.0
 [0.7.2]: https://github.com/melancholictheory/wellcake/releases/tag/v0.7.2
 [0.7.1]: https://github.com/melancholictheory/wellcake/releases/tag/v0.7.1
