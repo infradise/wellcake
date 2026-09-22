@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2]
+
+### Changed
+
+- Dependency bumps: ginkgo to 2.32.2, gomega to 1.43.0, docker/setup-qemu-action
+  to 4.4.0, docker/setup-buildx-action to 4.4.1, and docker/build-push-action
+  to 7.4.0.
+- README links the Helm charts published as OCI artifacts on GHCR.
+
 ## [0.8.1]
 
 ### Changed
@@ -255,6 +264,7 @@ First public release of the operator. Highlights of the initial feature set:
 - CEL XValidation for immutable and conditional fields; config-hash-driven
   rolling restarts; version-gated Valkey 9.x resilience directives.
 
+[0.8.2]: https://github.com/melancholictheory/wellcake/releases/tag/v0.8.2
 [0.8.1]: https://github.com/melancholictheory/wellcake/releases/tag/v0.8.1
 [0.8.0]: https://github.com/melancholictheory/wellcake/releases/tag/v0.8.0
 [0.7.2]: https://github.com/melancholictheory/wellcake/releases/tag/v0.7.2
